@@ -1,0 +1,176 @@
+# =============================================================================
+# Indian Road Perception — Class Configuration
+# =============================================================================
+# Author      : Ibrahim Khaleel Shaik
+# Affiliation : M.Tech Automotive Electronics, BITS Pilani (WILP)
+#               Mechanical Design Engineer — EPB Systems, Maruti Suzuki India
+# Purpose     : AEB-critical actor classification for Indian unstructured ODD
+# Reference   : IDD (India Driving Dataset) — IIIT Hyderabad
+#               Euro NCAP AEB VRU protocol 2023
+# Last Updated: 2025
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# CLASS TAXONOMY
+# Designed specifically for Indian road conditions.
+# Standard COCO classes are insufficient — they miss auto_rickshaw, cattle,
+# and do not distinguish motorcycle_rider as a combined AEB-critical unit.
+# -----------------------------------------------------------------------------
+classes:
+  0: pedestrian           # Walking person — highest AEB priority
+  1: bicycle              # Cyclist without motor
+  2: motorcycle_rider     # 2-wheeler + rider as single unit (Indian ODD)
+  3: auto_rickshaw        # 3-wheeler passenger vehicle — unique to India
+  4: car                  # Passenger car / SUV
+  5: bus                  # City bus / intercity bus
+  6: truck                # Commercial freight vehicle
+  7: cow                  # Free-roaming cattle — common urban/semi-urban
+  8: buffalo              # Larger than cow — different kinematic profile
+  9: dog                  # Stray dogs — sudden lateral movement risk
+  10: traffic_cone        # Construction / diversion markers
+  11: road_divider        # Physical median / divider
+
+nc: 12                    # Total number of classes
+
+# -----------------------------------------------------------------------------
+# AEB-CRITICAL CLASS FLAGS
+# Classes that activate AEB warning logic in combined_pipeline.py
+# Based on Euro NCAP VRU categories + Indian ODD additions (cattle, 3W)
+# -----------------------------------------------------------------------------
+aeb_critical_classes: [0, 1, 2, 3, 7, 8, 9]
+# Justification:
+#   - pedestrian     : Euro NCAP AEB Pedestrian mandatory
+#   - bicycle        : Euro NCAP AEB Cyclist mandatory
+#   - motorcycle_rider: High fatality rate in India (MoRTH 2023 data)
+#   - auto_rickshaw  : Unpredictable lateral cuts in urban ODD
+#   - cow / buffalo  : Non-signalling, low-contrast in low light
+#   - dog            : Sudden trajectory change, low radar cross-section
+
+# -----------------------------------------------------------------------------
+# SEGMENTATION CLASSES
+# Pixel-wise road scene understanding for ego-lane estimation
+# Based on IDD segmentation label set (Varma et al., IIIT Hyderabad)
+# -----------------------------------------------------------------------------
+seg_classes:
+  0: road
+  1: sidewalk
+  2: building
+  3: wall
+  4: fence
+  5: pole
+  6: traffic_light
+  7: traffic_sign
+  8: vegetation
+  9: terrain
+  10: sky
+  11: person
+  12: rider
+  13: car
+  14: truck
+  15: bus
+  16: train
+  17: motorcycle
+  18: bicycle
+  19: animal           # Merged: cow + buffalo + dog
+
+seg_nc: 20
+
+# Drivable area classes (used for ego-lane object filtering)
+drivable_classes: [0]   # Only 'road' pixels define drivable area
+
+# -----------------------------------------------------------------------------
+# DETECTION MODEL PARAMETERS
+# -----------------------------------------------------------------------------
+model:
+  architecture    : "yolov11s"          # YOLOv11 small — RTX 3060 optimised
+  weights         : "models/best.pt"    # Fine-tuned on IDD
+  pretrained      : "yolo11s.pt"        # COCO pretrained starting point
+  input_size      : 640                 # Pixels — width and height
+  confidence_thr  : 0.45               # Below this = ignored detection
+  iou_thr         : 0.50               # NMS overlap threshold
+  half_precision  : true               # FP16 on RTX 3060 — doubles FPS
+  device          : "cuda:0"
+
+# -----------------------------------------------------------------------------
+# SEGMENTATION MODEL PARAMETERS
+# -----------------------------------------------------------------------------
+seg_model:
+  architecture    : "deeplabv3plus"     # DeepLabV3+ with MobileNetV3 encoder
+  encoder         : "mobilenet_v3_large"
+  weights         : "models/seg_best.pth"
+  input_size      : 512                 # Smaller than detection — memory saving
+  num_classes     : 20
+
+# -----------------------------------------------------------------------------
+# CAMERA INTRINSIC PARAMETERS
+# Update these values with your actual camera calibration matrix
+# Reference values below are from KITTI dataset (Geiger et al.)
+# For TIHAN testbed: calibrate using OpenCV checkerboard method
+# -----------------------------------------------------------------------------
+camera:
+  focal_length_px : 718.856            # fx — pixels (update after calibration)
+  cx              : 607.193            # Principal point x
+  cy              : 185.216            # Principal point y
+  sensor_width_mm : 6.16
+  image_width_px  : 1242
+  image_height_px : 375
+  fps             : 30
+
+# -----------------------------------------------------------------------------
+# REAL-WORLD OBJECT HEIGHTS (metres)
+# Used for monocular distance estimation using pinhole camera model:
+#   distance = (real_height_m * focal_length_px) / bbox_height_px
+# Values sourced from:
+#   - IS 11231 (Indian Standard — vehicle dimensions)
+#   - MoRTH vehicle classification
+#   - Field measurements (cattle average)
+# -----------------------------------------------------------------------------
+object_heights_m:
+  pedestrian      : 1.70
+  bicycle         : 1.10
+  motorcycle_rider: 1.50
+  auto_rickshaw   : 1.80
+  car             : 1.50
+  bus             : 3.20
+  truck           : 3.50
+  cow             : 1.30
+  buffalo         : 1.40
+  dog             : 0.55
+  traffic_cone    : 0.75
+  road_divider    : 1.00
+
+# -----------------------------------------------------------------------------
+# AEB TRIGGER THRESHOLDS
+# Conservative values for dissertation demo — not for production deployment
+# Production thresholds require HARA per ISO 26262 / ISO 21448 (SOTIF)
+# -----------------------------------------------------------------------------
+aeb:
+  ttc_warning_s   : 3.0     # TTC below this → yellow warning banner
+  ttc_critical_s  : 1.5     # TTC below this → red AEB trigger banner
+  distance_max_m  : 50.0    # Objects beyond this ignored for AEB logic
+  distance_min_m  : 1.5     # Objects closer than this = sensor blind zone
+  ego_lane_width_m: 3.5     # Standard Indian lane width (IRC 86)
+  smoothing_alpha : 0.3     # EMA smoothing factor for TTC noise reduction
+
+# -----------------------------------------------------------------------------
+# VISUALISATION COLOURS (BGR format for OpenCV)
+# -----------------------------------------------------------------------------
+vis_colors:
+  pedestrian      : [0,   255, 255]   # Yellow
+  bicycle         : [0,   255,   0]   # Green
+  motorcycle_rider: [0,   165, 255]   # Orange
+  auto_rickshaw   : [255, 165,   0]   # Blue-orange
+  car             : [255, 255,   0]   # Cyan
+  bus             : [128,   0, 128]   # Purple
+  truck           : [0,     0, 255]   # Red
+  cow             : [0,   128, 255]   # Amber
+  buffalo         : [0,    69, 255]   # Deep amber
+  dog             : [255, 255,   0]   # Cyan
+  traffic_cone    : [0,   128, 255]   # Orange
+  road_divider    : [128, 128, 128]   # Grey
+  aeb_warning     : [0,   255, 255]   # Yellow banner
+  aeb_critical    : [0,     0, 255]   # Red banner
+
+# =============================================================================
+# END OF CONFIGURATION
+# =============================================================================

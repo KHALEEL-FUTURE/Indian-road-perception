@@ -1,0 +1,118 @@
+# =============================================================================
+# Indian Road Perception — Python Requirements
+# =============================================================================
+# Author      : Ibrahim Khaleel Shaik
+# Project     : Indian-road-perception
+# M.Tech Dissertation @ BITS Pilani | Maruti Suzuki India Ltd.
+# =============================================================================
+# Install with:
+#   pip install -r requirements.txt
+# For GPU support ensure CUDA 12.1+ is installed before running this.
+# Recommended: Use environment.yml with conda for full reproducibility.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# CORE DEEP LEARNING
+# -----------------------------------------------------------------------------
+torch>=2.1.0                      # PyTorch — GPU acceleration (CUDA 12.1)
+torchvision>=0.16.0               # Image transforms and pretrained models
+torchaudio>=2.1.0                 # (Optional) for future audio cues
+
+# -----------------------------------------------------------------------------
+# OBJECT DETECTION — YOLO
+# -----------------------------------------------------------------------------
+ultralytics>=8.3.0                # YOLOv11 — detection + segmentation
+
+# -----------------------------------------------------------------------------
+# SEMANTIC SEGMENTATION
+# -----------------------------------------------------------------------------
+segmentation-models-pytorch>=0.3.3  # DeepLabV3+, U-Net with pretrained encoders
+timm>=0.9.0                         # PyTorch image models — encoder backbone
+
+# -----------------------------------------------------------------------------
+# COMPUTER VISION
+# -----------------------------------------------------------------------------
+opencv-python>=4.9.0              # Video capture, frame processing, drawing
+opencv-contrib-python>=4.9.0      # Extra OpenCV modules (optical flow etc.)
+Pillow>=10.0.0                    # Image I/O
+
+# -----------------------------------------------------------------------------
+# NUMERICAL & DATA PROCESSING
+# -----------------------------------------------------------------------------
+numpy>=1.24.0                     # Array operations
+pandas>=2.0.0                     # Data manipulation, CSV handling
+scipy>=1.11.0                     # Signal processing, filtering
+
+# -----------------------------------------------------------------------------
+# DATASET & ANNOTATION
+# -----------------------------------------------------------------------------
+roboflow>=1.1.0                   # Dataset download from Roboflow Universe
+albumentations>=1.3.0             # Data augmentation pipeline
+pycocotools>=2.0.7                # COCO format evaluation metrics
+lxml>=4.9.0                       # Pascal VOC XML annotation parsing
+
+# -----------------------------------------------------------------------------
+# VISUALISATION & PLOTTING
+# -----------------------------------------------------------------------------
+matplotlib>=3.7.0                 # Plots, PR curves, confusion matrix
+seaborn>=0.12.0                   # Statistical visualisation
+plotly>=5.18.0                    # Interactive plots for notebooks
+
+# -----------------------------------------------------------------------------
+# INTERACTIVE DEMO — STREAMLIT APP
+# -----------------------------------------------------------------------------
+streamlit>=1.32.0                 # Web-based demo dashboard
+streamlit-webrtc>=0.47.0         # Webcam live stream in Streamlit
+
+# -----------------------------------------------------------------------------
+# CONFIGURATION & UTILITIES
+# -----------------------------------------------------------------------------
+pyyaml>=6.0                       # YAML config file parsing
+python-dotenv>=1.0.0              # Environment variable management
+tqdm>=4.66.0                      # Progress bars during training/inference
+rich>=13.0.0                      # Beautiful terminal output
+loguru>=0.7.0                     # Clean logging
+colorama>=0.4.6                   # Coloured terminal output (Windows compat)
+
+# -----------------------------------------------------------------------------
+# DISTANCE & TRACKING
+# -----------------------------------------------------------------------------
+filterpy>=1.4.5                   # Kalman filter for TTC smoothing
+lap>=0.4.0                        # Linear assignment (SORT tracker)
+
+# -----------------------------------------------------------------------------
+# NOTEBOOK & DEVELOPMENT
+# -----------------------------------------------------------------------------
+jupyter>=1.0.0                    # Jupyter notebook
+ipywidgets>=8.0.0                 # Interactive widgets in notebooks
+ipykernel>=6.25.0                 # Jupyter kernel
+
+# -----------------------------------------------------------------------------
+# EVALUATION & METRICS
+# -----------------------------------------------------------------------------
+scikit-learn>=1.3.0               # Confusion matrix, classification report
+torchmetrics>=1.2.0               # mAP, mIoU computation
+
+# -----------------------------------------------------------------------------
+# TESTING
+# -----------------------------------------------------------------------------
+pytest>=7.4.0                     # Automated test runner
+pytest-cov>=4.1.0                 # Code coverage reporting
+
+# -----------------------------------------------------------------------------
+# CODE QUALITY
+# -----------------------------------------------------------------------------
+black>=23.0.0                     # Code formatter
+flake8>=6.0.0                     # Linter
+isort>=5.12.0                     # Import sorter
+
+# =============================================================================
+# ROS2 PACKAGES — Install separately via apt, not pip
+# =============================================================================
+# sudo apt install ros-humble-desktop
+# sudo apt install ros-humble-cv-bridge
+# sudo apt install ros-humble-vision-msgs
+# sudo apt install ros-humble-sensor-msgs
+# These are NOT listed here as they conflict with pip installation.
+# See docs/architecture.md for ROS2 setup instructions.
+# =============================================================================

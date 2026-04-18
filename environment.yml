@@ -1,0 +1,165 @@
+# =============================================================================
+# Indian Road Perception — Conda Environment
+# =============================================================================
+# Author      : Ibrahim Khaleel Shaik
+# Project     : Indian-road-perception
+# M.Tech Dissertation @ BITS Pilani | Maruti Suzuki India Ltd.
+# Hardware    : NVIDIA RTX 3060 12GB VRAM | Ubuntu 22.04 LTS | CUDA 12.1
+# =============================================================================
+# Create environment:
+#   conda env create -f environment.yml
+#
+# Activate environment:
+#   conda activate perception_india
+#
+# Update existing environment:
+#   conda env update -f environment.yml --prune
+#
+# Export current environment (after adding packages):
+#   conda env export > environment.yml
+#
+# Remove environment:
+#   conda env remove -n perception_india
+# =============================================================================
+
+name: perception_india
+
+channels:
+  - pytorch                 # Official PyTorch channel
+  - nvidia                  # NVIDIA CUDA packages
+  - conda-forge             # Community packages — largest collection
+  - defaults                # Anaconda defaults — fallback
+
+dependencies:
+  # ---------------------------------------------------------------------------
+  # PYTHON
+  # ---------------------------------------------------------------------------
+  - python=3.10             # 3.10 — stable, ROS2 Humble compatible
+
+  # ---------------------------------------------------------------------------
+  # CUDA TOOLKIT (must match your driver version)
+  # Check your driver: nvidia-smi → look at CUDA Version top right
+  # RTX 3060 supports up to CUDA 12.x
+  # ---------------------------------------------------------------------------
+  - cudatoolkit=11.8        # Stable with PyTorch 2.1 — change to 12.1 if needed
+
+  # ---------------------------------------------------------------------------
+  # CORE SCIENTIFIC STACK (conda versions are more stable than pip)
+  # ---------------------------------------------------------------------------
+  - numpy>=1.24.0
+  - pandas>=2.0.0
+  - scipy>=1.11.0
+  - matplotlib>=3.7.0
+  - scikit-learn>=1.3.0
+
+  # ---------------------------------------------------------------------------
+  # JUPYTER
+  # ---------------------------------------------------------------------------
+  - jupyter
+  - ipykernel
+  - ipywidgets
+  - notebook
+
+  # ---------------------------------------------------------------------------
+  # BUILD TOOLS
+  # ---------------------------------------------------------------------------
+  - pip
+  - git
+  - cmake                   # Required for some pip packages
+  - ninja                   # Fast build system
+
+  # ---------------------------------------------------------------------------
+  # PIP PACKAGES
+  # All packages not available on conda channels installed via pip
+  # ---------------------------------------------------------------------------
+  - pip:
+    # -------------------------------------------------------------------------
+    # DEEP LEARNING
+    # -------------------------------------------------------------------------
+    - torch==2.1.2+cu118          # PyTorch with CUDA 11.8
+    - torchvision==0.16.2+cu118
+    - torchaudio==2.1.2+cu118
+    --extra-index-url https://download.pytorch.org/whl/cu118
+
+    # -------------------------------------------------------------------------
+    # OBJECT DETECTION
+    # -------------------------------------------------------------------------
+    - ultralytics>=8.3.0          # YOLOv11
+
+    # -------------------------------------------------------------------------
+    # SEGMENTATION
+    # -------------------------------------------------------------------------
+    - segmentation-models-pytorch>=0.3.3
+    - timm>=0.9.0
+
+    # -------------------------------------------------------------------------
+    # COMPUTER VISION
+    # -------------------------------------------------------------------------
+    - opencv-python>=4.9.0
+    - opencv-contrib-python>=4.9.0
+    - Pillow>=10.0.0
+
+    # -------------------------------------------------------------------------
+    # DATASET & ANNOTATION
+    # -------------------------------------------------------------------------
+    - roboflow>=1.1.0
+    - albumentations>=1.3.0
+    - pycocotools>=2.0.7
+    - lxml>=4.9.0
+
+    # -------------------------------------------------------------------------
+    # DEMO APPLICATION
+    # -------------------------------------------------------------------------
+    - streamlit>=1.32.0
+    - streamlit-webrtc>=0.47.0
+    - plotly>=5.18.0
+    - seaborn>=0.12.0
+
+    # -------------------------------------------------------------------------
+    # CONFIGURATION & UTILITIES
+    # -------------------------------------------------------------------------
+    - pyyaml>=6.0
+    - python-dotenv>=1.0.0
+    - tqdm>=4.66.0
+    - rich>=13.0.0
+    - loguru>=0.7.0
+    - colorama>=0.4.6
+
+    # -------------------------------------------------------------------------
+    # TRACKING & FILTERING
+    # -------------------------------------------------------------------------
+    - filterpy>=1.4.5
+    - lap>=0.4.0
+
+    # -------------------------------------------------------------------------
+    # METRICS
+    # -------------------------------------------------------------------------
+    - torchmetrics>=1.2.0
+
+    # -------------------------------------------------------------------------
+    # TESTING & CODE QUALITY
+    # -------------------------------------------------------------------------
+    - pytest>=7.4.0
+    - pytest-cov>=4.1.0
+    - black>=23.0.0
+    - flake8>=6.0.0
+    - isort>=5.12.0
+
+# =============================================================================
+# POST-INSTALLATION NOTES
+# =============================================================================
+# After activating the environment, register it as Jupyter kernel:
+#   python -m ipykernel install --user --name perception_india \
+#          --display-name "Python (perception_india)"
+#
+# Verify GPU is accessible:
+#   python -c "import torch; print(torch.cuda.is_available())"
+#   → Should print: True
+#
+# Verify YOLO is working:
+#   python -c "from ultralytics import YOLO; print('YOLO OK')"
+#
+# For ROS2 integration, source ROS2 BEFORE activating conda:
+#   source /opt/ros/humble/setup.bash
+#   conda activate perception_india
+# =============================================================================
